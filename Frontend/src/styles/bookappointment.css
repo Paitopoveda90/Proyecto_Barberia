@@ -1,0 +1,133 @@
+.appointment-container {
+  min-height: 90vh;
+  padding: 120px 20px 60px;
+  background: url("../assets/img/LOGO_BARBA.png") center center no-repeat;
+  background-size: 95vh;
+  text-align: center;
+  animation: fadeIn .8s ease;
+}
+
+.appointment-container h2 {
+  margin: 60px 300px 15px;
+  font-size: 2.3rem;
+  background: rgba(17, 17, 17, 0.85);
+  width: 35%;
+  border-radius: 12px;;
+}
+
+.appointment-card {
+  background: rgba(17, 17, 17, 0.85);
+  max-width: 500px;
+  margin: auto;
+  padding: 50px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255,215,0,0.25);
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-bottom: 2px solid #444;
+  background: rgba(17, 17, 17, 0.85);;
+  color: #fdfdfb;
+  outline: none;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  border-color: #ffd700;
+  color: #fdfdfb;
+}
+
+.date-unavailable {
+  border-color: red !important;
+}
+
+.unavailable-text {
+  color: #ff4d4d;
+  font-size: 0.85rem;
+}
+
+.btn-reserve {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: #ffd700;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.btn-reserve:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,215,0,0.4);
+}
+
+.btn-reserve:disabled {
+  cursor: not-allowed;
+}
+
+.btn-cancel{
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: #ffd700;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.btn-cancel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,215,0,0.4);
+}
+
+.calendar-legend {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  color: #ccc;
+}
+
+.calendar-legend i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 50%;
+}
+
+.available {
+  background: #ffd700;
+}
+
+.unavailable {
+  background: red;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
