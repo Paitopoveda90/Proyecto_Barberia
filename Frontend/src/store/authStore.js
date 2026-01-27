@@ -31,12 +31,8 @@ export const useAuthStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const res = await api.post('/auth/login', { email, password });
-      console.log("Respuesta del servidor:", res.data);
-      // IMPORTANTE: Verifica qué devuelve tu API. 
-      // Si tu API devuelve { token: "...", data: { name: "..." } }, 
-      // debes usar res.data.data
       const token = res.data.token || res.data.data?.token;
-      const user = res.data.user || res.data.data?.user || { id: 'unknown' }; // Forzamos un objeto si no viene
+      const user = res.data.user || res.data.data?.user || { id: 'unknown' };
 
       if (token) {
         localStorage.setItem('token', token);

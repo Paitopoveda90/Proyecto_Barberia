@@ -1,0 +1,61 @@
+/* Variables CSS para mantener consistencia en todo el proyecto */
+
+:root {
+  /* Colores principales */
+  --color-primary: #ffd700;
+  --color-primary-dark: #c5a223;
+  --color-primary-light: #ffed4e;
+  --color-secondary: #16221b;
+  --color-dark: #0a0f0c;
+  --color-dark-card: rgba(17, 17, 17, 0.85);
+  --color-text-primary: #ffd700;
+  --color-text-secondary: #ccc;
+  --color-text-muted: #aaa;
+  --color-white: #fff;
+  --color-black: #000;
+  
+  /* Colores de estado */
+  --color-success: #4caf50;
+  --color-error: #ff4d4d;
+  --color-warning: #ff9800;
+  
+  /* Espaciado */
+  --spacing-xs: 5px;
+  --spacing-sm: 10px;
+  --spacing-md: 20px;
+  --spacing-lg: 40px;
+  --spacing-xl: 60px;
+  
+  /* Tamaños de fuente */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.85rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.2rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 2.5rem;
+  
+  /* Bordes */
+  --border-radius-sm: 5px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 0 25px rgba(255, 215, 0, 0.25);
+  --shadow-gold: 0 5px 15px rgba(255, 215, 0, 0.4);
+  
+  /* Transiciones */
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.8s ease;
+  
+  /* Breakpoints (para uso en JavaScript) */
+  --breakpoint-mobile: 768px;
+  --breakpoint-tablet: 1024px;
+  --breakpoint-desktop: 1280px;
+  
+  /* Altura del navbar */
+  --navbar-height: 70px;
+}

@@ -1,0 +1,24 @@
+# Ignorar archivos de entorno y dependencias
+
+# Node
+node_modules/
+
+# Archivos de entorno
+*.env
+
+# Salidas de build
+/dist
+/build
+
+# Otros archivos temporales
+.DS_Store
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema operativo
+Thumbs.db

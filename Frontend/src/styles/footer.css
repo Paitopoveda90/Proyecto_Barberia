@@ -1,6 +1,23 @@
+@import './variables.css';
+
 .footer {
-  background: #0a0f0c;
-  color: #aaa;
+  background: var(--color-dark);
+  color: var(--color-text-muted);
   text-align: center;
-  padding: 20px;
+  padding: var(--spacing-md);
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.footer p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .footer {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
 }

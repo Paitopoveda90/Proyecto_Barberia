@@ -5,6 +5,7 @@ const admin = require('../middlewares/admin.middleware');
 const adminController = require('../controllers/admin.controller');
 const blockedDatesController = require('../controllers/blockedDates.controller');
 const servicesController = require('../controllers/services.controller');
+const upload = require('../middlewares/upload.middleware');
 
 
 // Rutas de administración - todas requieren autenticación y rol admin
@@ -19,8 +20,8 @@ router.post('/blocked-dates', auth, admin, blockedDatesController.create); // Bl
 router.delete('/blocked-dates/:id', auth, admin, blockedDatesController.delete); // Desbloquear fecha
 
 // Servicios (CRUD completo para admin)
-router.post('/services', auth, admin, servicesController.create); // Crear servicio
-router.put('/services/:id', auth, admin, servicesController.update); // Actualizar servicio
+router.post('/services', auth, admin, upload, servicesController.create); // Crear servicio con imagen
+router.put('/services/:id', auth, admin, upload, servicesController.update); // Actualizar servicio con imagen
 router.delete('/services/:id', auth, admin, servicesController.delete); // Eliminar servicio
 
 module.exports = router;

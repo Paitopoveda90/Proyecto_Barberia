@@ -3,6 +3,7 @@ import api from '../services/api';
 
 export const useAppointmentStore = create((set, get) => ({
   appointments: [],
+  blockedDates: [],
   loading: false,
   error: null,
 
@@ -46,6 +47,17 @@ export const useAppointmentStore = create((set, get) => ({
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Error al cargar las citas';
       set({ appointments: [], loading: false, error: errorMessage });
+    }
+  },
+
+  // Obtener fechas bloqueadas (público)
+  fetchBlockedDates: async () => {
+    try {
+      const res = await api.get('/blocked-dates');
+      set({ blockedDates: res.data || [] });
+    } catch (err) {
+      // Si falla, simplemente no hay fechas bloqueadas
+      set({ blockedDates: [] });
     }
   }
 }));

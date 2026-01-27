@@ -24,6 +24,11 @@ const Service = sequelize.define('Service', {
   price: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false
+  },
+  image_url: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    comment: 'URL de la imagen del servicio'
   }
 }, {
   tableName: 'services',

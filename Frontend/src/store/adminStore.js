@@ -88,7 +88,27 @@ export const useAdminStore = create((set, get) => ({
   createService: async (serviceData) => {
     set({ loading: true, error: null });
     try {
-      await api.post('/admin/services', serviceData);
+      // Si serviceData es FormData, enviarlo directamente; si no, crear FormData
+      const formData = serviceData instanceof FormData 
+        ? serviceData 
+        : (() => {
+            const fd = new FormData();
+            Object.keys(serviceData).forEach(key => {
+              if (key !== 'image' && serviceData[key] !== null && serviceData[key] !== undefined) {
+                fd.append(key, serviceData[key]);
+              }
+            });
+            if (serviceData.image) {
+              fd.append('image', serviceData.image);
+            }
+            return fd;
+          })();
+
+      await api.post('/admin/services', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       set({ loading: false });
       return { success: true };
     } catch (err) {

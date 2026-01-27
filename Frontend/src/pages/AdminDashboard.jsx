@@ -3,7 +3,57 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useAdminStore } from '../store/adminStore';
 import { useServiceStore } from '../store/serviceStore';
+import { 
+  CONFIRM_MESSAGES, 
+  SUCCESS_MESSAGES, 
+  ERROR_MESSAGES,
+  STATUS_LABELS,
+  APPOINTMENT_STATUS
+} from '../constants/messages';
 import '../styles/adminDashboard.css';
+
+// Función helper para formatear fechas sin problemas de zona horaria
+const formatDateLocal = (dateValue) => {
+  if (!dateValue) return '';
+  
+  // Si la fecha viene como string YYYY-MM-DD, parsearla correctamente
+  if (typeof dateValue === 'string') {
+    const datePart = dateValue.split('T')[0]; // Tomar solo la parte de fecha
+    const [year, month, day] = datePart.split('-');
+    // Crear Date usando constructor local (no UTC) para evitar cambios de día
+    const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    return dateObj.toLocaleDateString('es-ES', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
+  
+  // Si es un objeto Date, usar métodos locales
+  const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
+  return date.toLocaleDateString('es-ES', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+};
+
+// Función helper para formatear fechas en formato corto (DD/MM/YYYY)
+const formatDateShort = (dateValue) => {
+  if (!dateValue) return '';
+  
+  // Si la fecha viene como string YYYY-MM-DD, parsearla correctamente
+  if (typeof dateValue === 'string') {
+    const datePart = dateValue.split('T')[0];
+    const [year, month, day] = datePart.split('-');
+    const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    return dateObj.toLocaleDateString('es-ES');
+  }
+  
+  // Si es un objeto Date, usar métodos locales
+  const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
+  return date.toLocaleDateString('es-ES');
+};
 
 export default function AdminDashboard() {
   const { user, logout } = useAuthStore();
@@ -29,7 +79,8 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('appointments');
   const [showServiceForm, setShowServiceForm] = useState(false);
   const [showBlockForm, setShowBlockForm] = useState(false);
-  const [serviceForm, setServiceForm] = useState({ name: '', description: '', duration: '', price: '' });
+  const [serviceForm, setServiceForm] = useState({ name: '', description: '', duration: '', price: '', image: null });
+  const [imagePreview, setImagePreview] = useState(null);
   const [blockForm, setBlockForm] = useState({ date: '', time: '', reason: '' });
 
   useEffect(() => {
@@ -39,44 +90,68 @@ export default function AdminDashboard() {
     fetchServices();
   }, [fetchAllAppointments, fetchAllUsers, fetchBlockedDates, fetchServices]);
 
+  // Helper para mostrar mensajes
+  const showMessage = (message) => {
+    alert(message);
+  };
+
   const handleCancelAppointment = async (id) => {
-    if (window.confirm('¿Estás seguro de cancelar esta cita?')) {
+    if (window.confirm(CONFIRM_MESSAGES.CANCEL_APPOINTMENT)) {
       const result = await cancelAppointment(id);
       if (result.success) {
-        alert('Cita cancelada exitosamente');
+        showMessage(SUCCESS_MESSAGES.APPOINTMENT_CANCELLED);
       } else {
-        alert(result.error || 'Error al cancelar la cita');
+        showMessage(result.error || ERROR_MESSAGES.CANCEL_APPOINTMENT, true);
       }
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setServiceForm({ ...serviceForm, image: file });
+      // Crear preview de la imagen
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleCreateService = async (e) => {
     e.preventDefault();
-    const result = await createService({
-      name: serviceForm.name,
-      description: serviceForm.description,
-      duration: parseInt(serviceForm.duration),
-      price: parseFloat(serviceForm.price)
-    });
+    
+    const formData = new FormData();
+    formData.append('name', serviceForm.name);
+    formData.append('description', serviceForm.description || '');
+    formData.append('duration', serviceForm.duration);
+    formData.append('price', serviceForm.price);
+    if (serviceForm.image) {
+      formData.append('image', serviceForm.image);
+    }
+    
+    const result = await createService(formData);
     
     if (result.success) {
-      alert('Servicio creado exitosamente');
+      showMessage(SUCCESS_MESSAGES.SERVICE_CREATED);
       setShowServiceForm(false);
-      setServiceForm({ name: '', description: '', duration: '', price: '' });
+      setServiceForm({ name: '', description: '', duration: '', price: '', image: null });
+      setImagePreview(null);
       fetchServices();
     } else {
-      alert(result.error || 'Error al crear servicio');
+      showMessage(result.error || ERROR_MESSAGES.CREATE_SERVICE, true);
     }
   };
 
   const handleDeleteService = async (id) => {
-    if (window.confirm('¿Estás seguro de eliminar este servicio?')) {
+    if (window.confirm(CONFIRM_MESSAGES.DELETE_SERVICE)) {
       const result = await deleteService(id);
       if (result.success) {
-        alert('Servicio eliminado exitosamente');
+        showMessage(SUCCESS_MESSAGES.SERVICE_DELETED);
         fetchServices();
       } else {
-        alert(result.error || 'Error al eliminar servicio');
+        showMessage(result.error || ERROR_MESSAGES.DELETE_SERVICE, true);
       }
     }
   };
@@ -86,29 +161,29 @@ export default function AdminDashboard() {
     const result = await blockDate(blockForm.date, blockForm.time || null, blockForm.reason || null);
     
     if (result.success) {
-      alert('Fecha/horario bloqueado exitosamente');
+      showMessage(SUCCESS_MESSAGES.DATE_BLOCKED);
       setShowBlockForm(false);
       setBlockForm({ date: '', time: '', reason: '' });
       fetchBlockedDates();
     } else {
-      alert(result.error || 'Error al bloquear fecha');
+      showMessage(result.error || ERROR_MESSAGES.BLOCK_DATE, true);
     }
   };
 
   const handleUnblockDate = async (id) => {
-    if (window.confirm('¿Estás seguro de desbloquear esta fecha/horario?')) {
+    if (window.confirm(CONFIRM_MESSAGES.UNBLOCK_DATE)) {
       const result = await unblockDate(id);
       if (result.success) {
-        alert('Fecha/horario desbloqueado exitosamente');
+        showMessage(SUCCESS_MESSAGES.DATE_UNBLOCKED);
         fetchBlockedDates();
       } else {
-        alert(result.error || 'Error al desbloquear');
+        showMessage(result.error || ERROR_MESSAGES.UNBLOCK_DATE, true);
       }
     }
   };
 
   const handleLogout = () => {
-    if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+    if (window.confirm(CONFIRM_MESSAGES.LOGOUT)) {
       logout();
       navigate('/login');
     }
@@ -177,12 +252,10 @@ export default function AdminDashboard() {
                   <div>
                     <strong>{app.User?.name || 'Cliente'}</strong>
                     <p>Servicio: {app.Service?.name || 'N/A'}</p>
-                    <p>Fecha: {new Date(app.date).toLocaleDateString('es-ES')}</p>
+                    <p>Fecha: {formatDateLocal(app.date)}</p>
                     {app.time && <p>Hora: {app.time}</p>}
                     <span className={`status status-${app.status}`}>
-                      {app.status === 'scheduled' ? 'Programada' : 
-                       app.status === 'completed' ? 'Completada' : 
-                       app.status === 'cancelled' ? 'Cancelada' : app.status}
+                      {STATUS_LABELS[app.status] || app.status}
                     </span>
                   </div>
                   {app.status === 'scheduled' && (
@@ -221,7 +294,7 @@ export default function AdminDashboard() {
                         <strong>Sus citas:</strong>
                         {userItem.Appointments.map(apt => (
                           <div key={apt.id} className="mini-appointment">
-                            {apt.Service?.name} - {new Date(apt.date).toLocaleDateString('es-ES')} {apt.time && `- ${apt.time}`}
+                            {apt.Service?.name} - {formatDateShort(apt.date)} {apt.time && `- ${apt.time}`}
                           </div>
                         ))}
                       </div>
@@ -246,7 +319,7 @@ export default function AdminDashboard() {
           </button>
 
           {showServiceForm && (
-            <form onSubmit={handleCreateService} className="service-form">
+            <form onSubmit={handleCreateService} className="service-form" encType="multipart/form-data">
               <input
                 type="text"
                 placeholder="Nombre del servicio"
@@ -274,6 +347,27 @@ export default function AdminDashboard() {
                 onChange={(e) => setServiceForm({...serviceForm, price: e.target.value})}
                 required
               />
+              <div className="image-upload-section">
+                <label htmlFor="service-image" className="image-upload-label">
+                  Imagen del servicio (opcional)
+                </label>
+                <input
+                  type="file"
+                  id="service-image"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ marginBottom: '10px' }}
+                />
+                {imagePreview && (
+                  <div className="image-preview">
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '8px', marginTop: '10px' }}
+                    />
+                  </div>
+                )}
+              </div>
               <button type="submit" disabled={loading}>Crear Servicio</button>
             </form>
           )}
@@ -342,7 +436,7 @@ export default function AdminDashboard() {
               blockedDates.map(blocked => (
                 <div key={blocked.id} className="blocked-item">
                   <div>
-                    <strong>Fecha: {new Date(blocked.date).toLocaleDateString('es-ES')}</strong>
+                    <strong>Fecha: {formatDateLocal(blocked.date)}</strong>
                     {blocked.time ? (
                       <p>Hora: {blocked.time}</p>
                     ) : (

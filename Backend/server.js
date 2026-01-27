@@ -7,7 +7,13 @@ require('./src/models');
 const PORT = process.env.PORT || 4000;
 
 // Sincroniza la base de datos y arranca el servidor
-sequelize.sync().then(() => {
-  console.log('DB connected');
-  app.listen(PORT, () => console.log(`Server running on ${PORT}`));
-});
+// alter: true modifica las tablas existentes para que coincidan con los modelos
+sequelize.sync({ alter: true })
+  .then(() => {
+    console.log('✅ DB connected y sincronizada');
+    app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
+  })
+  .catch(err => {
+    console.error('❌ Error al sincronizar la base de datos:', err.message);
+    process.exit(1);
+  });

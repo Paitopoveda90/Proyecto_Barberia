@@ -3,10 +3,44 @@ const { BlockedDate } = require('../models');
 // Obtener todas las fechas y horarios bloqueados
 exports.getAll = async (req, res) => {
   try {
+    // Verificar que el modelo esté disponible
+    if (!BlockedDate) {
+      console.error('BlockedDate model is not available');
+      return res.status(500).json({ message: 'Error: Modelo no disponible' });
+    }
+    
     const blockedDates = await BlockedDate.findAll({
       order: [['date', 'ASC'], ['time', 'ASC']]
     });
-    res.json(blockedDates);
+    
+    // Formatear las fechas a YYYY-MM-DD para evitar problemas de zona horaria
+    const formattedDates = blockedDates.map(blocked => {
+      const date = blocked.date;
+      // Si date es un objeto Date, formatearlo; si es string, asegurar formato YYYY-MM-DD
+      let dateStr;
+      if (date instanceof Date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        dateStr = `${year}-${month}-${day}`;
+      } else if (typeof date === 'string') {
+        // Si viene como string, tomar solo la parte de fecha (YYYY-MM-DD)
+        dateStr = date.split('T')[0];
+      } else {
+        dateStr = date;
+      }
+      
+      return {
+        id: blocked.id,
+        date: dateStr,
+        time: blocked.time,
+        reason: blocked.reason,
+        created_at: blocked.created_at,
+        updated_at: blocked.updated_at
+      };
+    });
+    
+    res.json(formattedDates);
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener fechas bloqueadas', error: error.message });
   }

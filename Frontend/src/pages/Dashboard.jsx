@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppointmentStore } from '../store/appointmentStore';
 import { useAuthStore } from '../store/authStore';
+import { formatDateLocal } from '../utils/dateHelpers';
+import { CONFIRM_MESSAGES } from '../constants/messages';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
@@ -14,14 +16,14 @@ export default function Dashboard() {
   }, [fetchMyAppointments]);
 
   const handleDeleteAppointment = async (id) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
+    if (window.confirm(CONFIRM_MESSAGES.DELETE_APPOINTMENT || '¿Estás seguro de que deseas eliminar esta cita?')) {
       await deleteAppointment(id);
-      await fetchMyAppointments(); // Recargar la lista después de eliminar
+      await fetchMyAppointments();
     }
   };
 
   const handleLogout = () => {
-    if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+    if (window.confirm(CONFIRM_MESSAGES.LOGOUT || '¿Estás seguro de que deseas cerrar sesión?')) {
       logout();
       navigate('/login');
     }
@@ -55,12 +57,7 @@ export default function Dashboard() {
               <div key={app.id} className="appointment-item">
                 <div>
                   <strong>{app.Service?.name || 'Servicio no disponible'}</strong>
-                  <p>Fecha: {new Date(app.date).toLocaleDateString('es-ES', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}</p>
+                  <p>Fecha: {formatDateLocal(app.date)}</p>
                   {app.time && <p>Hora: {app.time}</p>}
                   <span className={`status status-${app.status}`}>
                     {app.status === 'scheduled' ? 'Programada' : 
